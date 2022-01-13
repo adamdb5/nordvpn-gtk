@@ -123,13 +123,8 @@ func updateConnectionStatus(app *types.Application) error {
 	}
 
 	connectedText := status.GetState()
-	if connectedText == "Connected" {
-		app.Ui.StatusLabel.SetMarkup("<span foreground=\"green\">" + connectedText + "</span>")
-		app.Ui.DisconnectButton.SetSensitive(true)
-	} else {
-		app.Ui.StatusLabel.SetMarkup("<span foreground=\"red\">" + connectedText + "</span>")
-		app.Ui.DisconnectButton.SetSensitive(false)
-	}
+	app.Ui.StatusLabel.SetText(connectedText)
+	app.Ui.DisconnectButton.SetSensitive(connectedText == "Connected")
 
 	return nil
 }
@@ -576,7 +571,7 @@ func checkSession(app *types.Application) {
 	for {
 		status, err := app.Client.Status()
 		if err == nil && status.GetState() == "Connected" {
-			app.Ui.SessionStatusLabel.SetMarkup("<span foreground=\"green\">" + status.GetState() + "</span>")
+			app.Ui.SessionStatusLabel.SetText(status.GetState())
 			app.Ui.SessionServerLabel.SetText(status.GetHostname())
 			app.Ui.SessionCountryLabel.SetText(status.GetCountry())
 			app.Ui.SessionCityLabel.SetText(status.GetCity())
@@ -587,7 +582,7 @@ func checkSession(app *types.Application) {
 			app.Ui.SessionBytesSentLabel.SetText(byteCountIEC(status.GetUpload()))
 			app.Ui.SessionUptimeLabel.SetText(formatDuration(status.GetUptime()))
 		} else {
-			app.Ui.SessionStatusLabel.SetMarkup("<span foreground=\"red\">Disconnected</span>")
+			app.Ui.SessionStatusLabel.SetText("Disconnected")
 		}
 		time.Sleep(1 * time.Second)
 	}
