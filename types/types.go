@@ -43,6 +43,21 @@ type UI struct {
 	SessionBytesSentLabel     *gtk.Label
 	SessionUptimeLabel        *gtk.Label
 
+	// Account Tab
+	AccountStatusLabel       *gtk.Label
+	AccountEmailLabel        *gtk.Label
+	AccountExpiresLabel      *gtk.Label
+	AccountLogoutButton      *gtk.Button
+	AccountRefreshButton     *gtk.Button
+	AccountEmailEntry        *gtk.Entry
+	AccountPasswordEntry     *gtk.Entry
+	AccountLoginButton       *gtk.Button
+	AccountOAuthButton       *gtk.Button
+	AccountOAuthURLEntry     *gtk.Entry
+	AccountOpenBrowserButton *gtk.Button
+	AccountLoginFrame        *gtk.Frame
+	AccountOAuthFrame        *gtk.Frame
+
 	// About Tab
 	AboutNameLabel        *gtk.Label
 	AboutVersionLabel     *gtk.Label

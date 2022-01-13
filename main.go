@@ -12,6 +12,7 @@ import (
 	"main/types"
 	"math"
 	"os"
+	"os/exec"
 	"strings"
 	"time"
 )
@@ -133,6 +134,41 @@ func updateConnectionStatus(app *types.Application) error {
 	return nil
 }
 
+func updateAccountInformation(app *types.Application) error {
+	isLoggedIn, err := app.Client.IsLoggedIn()
+	if err != nil {
+		log.Printf("Error: Lost connection to NordVPN daemon: %s", err)
+		app.Ui.InfoBarButton.SetLabel("Reconnect")
+		app.Ui.InfoBarButton.Connect("clicked", func() { connectToDaemon(app) })
+		showInfoBar("Lost connection to NordVPN daemon", gtk.MESSAGE_ERROR, app.Ui)
+		return err
+	}
+
+	if !isLoggedIn.GetIsLoggedIn() {
+		app.Ui.AccountEmailLabel.SetText("N/A")
+		app.Ui.AccountExpiresLabel.SetText("N/A")
+		app.Ui.AccountLoginFrame.SetSensitive(true)
+		app.Ui.AccountOAuthFrame.SetSensitive(true)
+		app.Ui.AccountLogoutButton.SetSensitive(false)
+		app.Ui.AccountStatusLabel.SetText("Not Logged In")
+		log.Printf("Error: You are not logged in to NordVPN: %s", err)
+		app.Ui.InfoBarButton.SetLabel("Dismiss")
+		app.Ui.InfoBarButton.Connect("clicked", func() { app.Ui.InfoBar.Hide() })
+		showInfoBar("You are not logged in to NordVPN", gtk.MESSAGE_ERROR, app.Ui)
+		return err
+	}
+
+	account, _ := app.Client.AccountInfo()
+	app.Ui.AccountEmailLabel.SetText(account.GetEmail())
+	app.Ui.AccountExpiresLabel.SetText(account.GetExpiresAt())
+	app.Ui.AccountLoginFrame.SetSensitive(false)
+	app.Ui.AccountOAuthFrame.SetSensitive(false)
+	app.Ui.AccountLogoutButton.SetSensitive(true)
+	app.Ui.AccountStatusLabel.SetText("Logged In")
+
+	return nil
+}
+
 func connectToDaemon(app *types.Application) error {
 	hideInfoBar(app.Ui)
 	client, err := opennord.NewOpenNordClient()
@@ -147,6 +183,7 @@ func connectToDaemon(app *types.Application) error {
 
 	// Check if we're already connected to the vpn
 	updateConnectionStatus(app)
+	updateAccountInformation(app)
 
 	// If successful, populate the countries
 	populateCountries(app)
@@ -190,8 +227,9 @@ func main() {
 				ServerConnectButton:   getButton(builder, "server_connect_button"),
 
 				// Session
-				SessionStatusLabel:        getLabel(builder, "session_status_label"),
-				SessionServerLabel:        getLabel(builder, "session_server_label"),
+				SessionStatusLabel: getLabel(builder, "session_status_label"),
+				SessionServerLabel: getLabel(builder, "session_server_label"),
+
 				SessionCountryLabel:       getLabel(builder, "session_country_label"),
 				SessionCityLabel:          getLabel(builder, "session_city_label"),
 				SessionServerIPLabel:      getLabel(builder, "session_server_ip_label"),
@@ -200,6 +238,21 @@ func main() {
 				SessionBytesReceivedLabel: getLabel(builder, "session_bytes_received_label"),
 				SessionBytesSentLabel:     getLabel(builder, "session_bytes_sent_label"),
 				SessionUptimeLabel:        getLabel(builder, "session_uptime_label"),
+
+				// Account Tab
+				AccountStatusLabel:       getLabel(builder, "account_status_label"),
+				AccountEmailLabel:        getLabel(builder, "account_email_label"),
+				AccountExpiresLabel:      getLabel(builder, "account_expires_label"),
+				AccountLogoutButton:      getButton(builder, "account_logout_button"),
+				AccountRefreshButton:     getButton(builder, "account_refresh_button"),
+				AccountEmailEntry:        getEntry(builder, "account_email_entry"),
+				AccountPasswordEntry:     getEntry(builder, "account_password_entry"),
+				AccountLoginButton:       getButton(builder, "account_login_button"),
+				AccountOAuthButton:       getButton(builder, "account_oauth_button"),
+				AccountOAuthURLEntry:     getEntry(builder, "account_oauth_url_entry"),
+				AccountOpenBrowserButton: getButton(builder, "account_open_browser_button"),
+				AccountLoginFrame:        getFrame(builder, "account_login_frame"),
+				AccountOAuthFrame:        getFrame(builder, "account_oauth_frame"),
 
 				// About
 				AboutNameLabel:        getLabel(builder, "about_name_label"),
@@ -229,6 +282,10 @@ func main() {
 		app.Ui.CityConnectButton.Connect("clicked", func() { onCityConnect(&app) })
 		app.Ui.GroupConnectButton.Connect("clicked", func() { onGroupConnect(&app) })
 		app.Ui.ServerConnectButton.Connect("clicked", func() { onServerConnect(&app) })
+		app.Ui.AccountLogoutButton.Connect("clicked", func() { onLogoutConnect(&app) })
+		app.Ui.AccountRefreshButton.Connect("clicked", func() { onRefreshConnect(&app) })
+		app.Ui.AccountLoginButton.Connect("clicked", func() { onLoginConnect(&app) })
+		app.Ui.AccountOAuthButton.Connect("clicked", func() { onOAuthConnect(&app) })
 
 		go checkSession(&app)
 
@@ -237,6 +294,137 @@ func main() {
 	})
 
 	os.Exit(application.Run(os.Args))
+}
+
+func onRefreshConnect(app *types.Application) {
+	isLoggedIn, err := app.Client.IsLoggedIn()
+
+	if err != nil {
+		log.Printf("Error: Lost connection to NordVPN daemon: %s", err)
+		app.Ui.InfoBarButton.SetLabel("Dismiss")
+		app.Ui.InfoBarButton.Connect("clicked", func() { app.Ui.InfoBar.Hide() })
+		showInfoBar("Lost connection to NordVPN daemon", gtk.MESSAGE_ERROR, app.Ui)
+		return
+	}
+
+	if isLoggedIn.GetIsLoggedIn() {
+		updateAccountInformation(app)
+	}
+}
+
+func onOAuthConnect(app *types.Application) error {
+	isLoggedIn, err := app.Client.IsLoggedIn()
+
+	if err != nil {
+		log.Printf("Error: Lost connection to NordVPN daemon: %s", err)
+		app.Ui.InfoBarButton.SetLabel("Dismiss")
+		app.Ui.InfoBarButton.Connect("clicked", func() { app.Ui.InfoBar.Hide() })
+		showInfoBar("Lost connection to NordVPN daemon", gtk.MESSAGE_ERROR, app.Ui)
+		return err
+	}
+
+	// This should only happen if the user already logged in using the CLI
+	if isLoggedIn.GetIsLoggedIn() {
+		updateAccountInformation(app)
+		return nil
+	}
+
+	oauth, err := app.Client.LoginOAuth2()
+	if err != nil {
+		log.Printf("Error: Unable to get OAuth token: %s", err)
+		app.Ui.InfoBarButton.SetLabel("Dismiss")
+		app.Ui.InfoBarButton.Connect("clicked", func() { app.Ui.InfoBar.Hide() })
+		showInfoBar("Unable to get OAuth token", gtk.MESSAGE_ERROR, app.Ui)
+		return err
+	}
+
+	app.Ui.AccountOAuthURLEntry.SetText(oauth.GetUrl())
+	app.Ui.AccountOpenBrowserButton.Connect("clicked", func() {
+		err = exec.Command("xdg-open", oauth.GetUrl()).Start()
+		if err != nil {
+			log.Printf("Error: Unable to open URL: %s", err)
+			app.Ui.InfoBarButton.SetLabel("Dismiss")
+			app.Ui.InfoBarButton.Connect("clicked", func() { app.Ui.InfoBar.Hide() })
+			showInfoBar("Unable to open URL", gtk.MESSAGE_ERROR, app.Ui)
+		}
+	})
+
+	// We don't get a callback from the daemon, so the user will need to refresh to see if this worked :/
+
+	return nil
+}
+
+func onLoginConnect(app *types.Application) error {
+	isLoggedIn, err := app.Client.IsLoggedIn()
+
+	if err != nil {
+		log.Printf("Error: Lost connection to NordVPN daemon: %s", err)
+		app.Ui.InfoBarButton.SetLabel("Dismiss")
+		app.Ui.InfoBarButton.Connect("clicked", func() { app.Ui.InfoBar.Hide() })
+		showInfoBar("Lost connection to NordVPN daemon", gtk.MESSAGE_ERROR, app.Ui)
+		return err
+	}
+
+	// This should only happen if the user already logged in using the CLI
+	if isLoggedIn.GetIsLoggedIn() {
+		updateAccountInformation(app)
+		return nil
+	}
+
+	username, _ := app.Ui.AccountEmailEntry.GetText()
+	password, _ := app.Ui.AccountPasswordEntry.GetText()
+	err = app.Client.Login(&pb.LoginRequest{
+		Username: username,
+		Password: password,
+	})
+	if err != nil {
+		log.Printf("Error: Unable to log in: %s", err)
+		app.Ui.InfoBarButton.SetLabel("Dismiss")
+		app.Ui.InfoBarButton.Connect("clicked", func() { app.Ui.InfoBar.Hide() })
+		showInfoBar("Unable to log in", gtk.MESSAGE_ERROR, app.Ui)
+		return err
+	}
+
+	updateAccountInformation(app)
+	log.Printf("Info: Logged in using email %s", username)
+	app.Ui.InfoBarButton.SetLabel("Dismiss")
+	app.Ui.InfoBarButton.Connect("clicked", func() { app.Ui.InfoBar.Hide() })
+	showInfoBar("Logged in using email "+username, gtk.MESSAGE_INFO, app.Ui)
+	return nil
+}
+
+func onLogoutConnect(app *types.Application) error {
+	isLoggedIn, err := app.Client.IsLoggedIn()
+
+	if err != nil {
+		log.Printf("Error: Lost connection to NordVPN daemon: %s", err)
+		app.Ui.InfoBarButton.SetLabel("Reconnect")
+		app.Ui.InfoBarButton.Connect("clicked", func() { connectToDaemon(app) })
+		showInfoBar("Lost connection to NordVPN daemon", gtk.MESSAGE_ERROR, app.Ui)
+		return err
+	}
+
+	// This should only happen if the user already logged out using the CLI
+	if !isLoggedIn.GetIsLoggedIn() {
+		updateAccountInformation(app)
+		return nil
+	}
+
+	err = app.Client.Logout()
+	if err != nil {
+		log.Printf("Error: Unable to log out: %s", err)
+		app.Ui.InfoBarButton.SetLabel("Dismiss")
+		app.Ui.InfoBarButton.Connect("clicked", func() { app.Ui.InfoBar.Hide() })
+		showInfoBar("Unable to log out", gtk.MESSAGE_ERROR, app.Ui)
+		return err
+	}
+
+	updateAccountInformation(app)
+	log.Println("Successfully logged out", err)
+	app.Ui.InfoBarButton.SetLabel("Dismiss")
+	app.Ui.InfoBarButton.Connect("clicked", func() { app.Ui.InfoBar.Hide() })
+	showInfoBar("Successfully logged out.", gtk.MESSAGE_INFO, app.Ui)
+	return nil
 }
 
 func getEntry(builder *gtk.Builder, name string) *gtk.Entry {
@@ -267,6 +455,11 @@ func getComboBoxText(builder *gtk.Builder, name string) *gtk.ComboBoxText {
 func getButton(builder *gtk.Builder, name string) *gtk.Button {
 	obj, _ := builder.GetObject(name)
 	return obj.(*gtk.Button)
+}
+
+func getFrame(builder *gtk.Builder, name string) *gtk.Frame {
+	obj, _ := builder.GetObject(name)
+	return obj.(*gtk.Frame)
 }
 
 func onCountrySelected(app *types.Application) {
