@@ -11,14 +11,35 @@ type Application struct {
 }
 
 type UI struct {
+	// Root
 	Window *gtk.Window
 
+	// Global
 	InfoBar       *gtk.InfoBar
 	InfoBarLabel  *gtk.Label
 	InfoBarButton *gtk.Button
 
+	// Connect Tab
+	StatusLabel           *gtk.Label
 	CountriesComboBoxText *gtk.ComboBoxText
 	CitiesComboBoxText    *gtk.ComboBoxText
+	GroupsComboBoxText    *gtk.ComboBoxText
+	ServerEntry           *gtk.Entry
+	DisconnectButton      *gtk.Button
+	CountryConnectButton  *gtk.Button
+	CityConnectButton     *gtk.Button
+	GroupConnectButton    *gtk.Button
+	ServerConnectButton   *gtk.Button
 
-	StatusLabel *gtk.Label
+	// Session Tab
+	SessionStatusLabel        *gtk.Label
+	SessionServerLabel        *gtk.Label
+	SessionCountryLabel       *gtk.Label
+	SessionCityLabel          *gtk.Label
+	SessionServerIPLabel      *gtk.Label
+	SessionTechnologyLabel    *gtk.Label
+	SessionProtocolLabel      *gtk.Label
+	SessionBytesReceivedLabel *gtk.Label
+	SessionBytesSentLabel     *gtk.Label
+	SessionUptimeLabel        *gtk.Label
 }
