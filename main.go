@@ -17,7 +17,13 @@ import (
 )
 
 const (
-	appId = "net.adambruce.nordvpn-gtk"
+	appId          = "net.adambruce.nordvpn-gtk"
+	appName        = "NordVPN GTK"
+	appVersion     = "0.0.1-alpha"
+	appDescription = "GTK+ client for NordVPN built using <a href=\"https://github.com/adamdb5/opennord\">OpenNord</a>."
+	appWebsite     = "https://github.com/adamdb5/nordvpn-gtk"
+	appCopyright   = "2022 Adam Bruce"
+	appLicense     = "<a href=\"https://github.com/adamdb5/nordvpn-gtk/blob/main/LICENSE\">MIT License</a>"
 )
 
 func showInfoBar(text string, messageType gtk.MessageType, ui *types.UI) {
@@ -124,9 +130,6 @@ func updateConnectionStatus(app *types.Application) error {
 		app.Ui.DisconnectButton.SetSensitive(false)
 	}
 
-	// Update session tab
-	//onSessionRefresh(app)
-
 	return nil
 }
 
@@ -197,12 +200,28 @@ func main() {
 				SessionBytesReceivedLabel: getLabel(builder, "session_bytes_received_label"),
 				SessionBytesSentLabel:     getLabel(builder, "session_bytes_sent_label"),
 				SessionUptimeLabel:        getLabel(builder, "session_uptime_label"),
+
+				// About
+				AboutNameLabel:        getLabel(builder, "about_name_label"),
+				AboutVersionLabel:     getLabel(builder, "about_version_label"),
+				AboutDescriptionLabel: getLabel(builder, "about_description_label"),
+				AboutWebsiteLabel:     getLabel(builder, "about_website_label"),
+				AboutCopyrightLabel:   getLabel(builder, "about_copyright_label"),
+				AboutLicenseLabel:     getLabel(builder, "about_license_label"),
 			},
 		}
 
 		if connectToDaemon(&app) != nil {
 			app.Ui.InfoBarButton.Connect("clicked", func() { connectToDaemon(&app) })
 		}
+
+		// Fill in about info
+		app.Ui.AboutNameLabel.SetMarkup("<span size=\"20pt\"><b>" + appName + "</b></span>")
+		app.Ui.AboutVersionLabel.SetMarkup(appVersion)
+		app.Ui.AboutDescriptionLabel.SetMarkup(appDescription)
+		app.Ui.AboutWebsiteLabel.SetMarkup("<span><a href=\"" + appWebsite + "\">" + appName + " Website</a></span>")
+		app.Ui.AboutCopyrightLabel.SetMarkup("\302\251 " + appCopyright)
+		app.Ui.AboutLicenseLabel.SetMarkup("This software is distributed under the " + appLicense + ".")
 
 		app.Ui.CountriesComboBoxText.Connect("changed", func() { onCountrySelected(&app) })
 		app.Ui.DisconnectButton.Connect("clicked", func() { onDisconnectClicked(&app) })

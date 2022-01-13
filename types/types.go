@@ -42,4 +42,12 @@ type UI struct {
 	SessionBytesReceivedLabel *gtk.Label
 	SessionBytesSentLabel     *gtk.Label
 	SessionUptimeLabel        *gtk.Label
+
+	// About Tab
+	AboutNameLabel        *gtk.Label
+	AboutVersionLabel     *gtk.Label
+	AboutDescriptionLabel *gtk.Label
+	AboutWebsiteLabel     *gtk.Label
+	AboutCopyrightLabel   *gtk.Label
+	AboutLicenseLabel     *gtk.Label
 }
