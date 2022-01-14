@@ -147,7 +147,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel" id="status_label">
+                      <object class="GtkLabel" id="connect_status_label">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="halign">start</property>
@@ -161,7 +161,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkComboBoxText" id="country_combo">
+                      <object class="GtkComboBoxText" id="connect_country_combo_text">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                       </object>
@@ -171,7 +171,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkComboBoxText" id="city_combo">
+                      <object class="GtkComboBoxText" id="connect_city_combo_text">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                       </object>
@@ -194,7 +194,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkComboBoxText" id="group_combo">
+                      <object class="GtkComboBoxText" id="connect_group_combo_text">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                       </object>
@@ -217,7 +217,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkEntry" id="server_entry">
+                      <object class="GtkEntry" id="connect_server_entry">
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                       </object>
@@ -227,7 +227,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="country_connect_button">
+                      <object class="GtkButton" id="connect_country_connect_button">
                         <property name="label" translatable="yes">Connect to Country</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
@@ -239,7 +239,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="city_connect_button">
+                      <object class="GtkButton" id="connect_city_connect_button">
                         <property name="label" translatable="yes">Connect to City</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
@@ -251,7 +251,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="group_connect_button">
+                      <object class="GtkButton" id="connect_group_connect_button">
                         <property name="label" translatable="yes">Connect to Group</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
@@ -263,7 +263,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="server_connect_button">
+                      <object class="GtkButton" id="connect_server_connect_button">
                         <property name="label" translatable="yes">Connect to Specific Server</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
@@ -275,7 +275,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="disconnect_button">
+                      <object class="GtkButton" id="connect_disconnect_button">
                         <property name="label" translatable="yes">Disconnect</property>
                         <property name="visible">True</property>
                         <property name="sensitive">False</property>
@@ -295,7 +295,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton" id="save_connect_button">
+                  <object class="GtkButton" id="connect_save_button">
                     <property name="label" translatable="yes">Save</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
