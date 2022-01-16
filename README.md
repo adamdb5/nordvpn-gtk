@@ -20,8 +20,10 @@ This library is licensed under the MIT license.
 These are some screenshots of the current application. The UI layout may change in the future.
 
 Connect Tab:
+
 ![img](/docs/images/ConnectTab.png)
 
 
 Session Tab:
+
 ![img](/docs/images/SessionTab.png)
