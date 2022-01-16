@@ -7,6 +7,15 @@ func LogInfo(message string) {
 	log.Printf("[INFO ] %s", message)
 }
 
+// LogWarning logs a message with the prefix '[WARN ]' and an optional error.
+func LogWarning(message string, error error) {
+	if error != nil {
+		log.Printf("[WARN ] %s: %s", message, error)
+	} else {
+		log.Printf("[WARN ] %s", message)
+	}
+}
+
 // LogError logs a message with the prefix '[ERROR]' and an optional error.
 func LogError(message string, error error) {
 	if error != nil {

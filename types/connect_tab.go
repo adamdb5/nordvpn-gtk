@@ -18,6 +18,8 @@ type ConnectTab struct {
 	CityConnectButton     *gtk.Button
 	GroupConnectButton    *gtk.Button
 	ServerConnectButton   *gtk.Button
+	BestConnectButton     *gtk.Button
+	SaveButton            *gtk.Button
 }
 
 // BuildConnectTab constructs the GTKNotebook page for the 'Connect' tab from
@@ -44,7 +46,22 @@ func BuildConnectTab(builder *gtk.Builder) *ConnectTab {
 			"connect_group_connect_button"),
 		ServerConnectButton: util.BuilderGetButton(builder,
 			"connect_server_connect_button"),
+		BestConnectButton: util.BuilderGetButton(builder,
+			"connect_best_connect_button"),
+		SaveButton: util.BuilderGetButton(builder,
+			"connect_save_button"),
 	}
+}
+
+func ConnectSaveClicked(app *Application) error {
+	serverText, _ := app.Window.ConnectTab.ServerEntry.GetText()
+	app.Config.Connect = &Connect{
+		Country: app.Window.ConnectTab.CountriesComboBoxText.GetActiveText(),
+		City:    app.Window.ConnectTab.CitiesComboBoxText.GetActiveText(),
+		Group:   app.Window.ConnectTab.GroupsComboBoxText.GetActiveText(),
+		Server:  serverText,
+	}
+	return SaveConfig(app)
 }
 
 // DisconnectClicked is invoked whenever the 'Disconnect' button on the

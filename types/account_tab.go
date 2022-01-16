@@ -160,7 +160,7 @@ func LoginClicked(app *Application) error {
 	}
 
 	_ = app.UpdateAccountInformation()
-	util.LogInfo("Logged in using email " + username)
+	util.LogInfo("Logged in using email" + username)
 	infoBar.Button.SetLabel("Dismiss")
 	infoBar.Button.Connect("clicked", infoBar.HideMessage)
 	infoBar.DisplayMessage("Logged in using email "+username, gtk.MESSAGE_INFO)

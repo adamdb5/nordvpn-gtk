@@ -8,6 +8,7 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 	"io"
 	"main/util"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -17,6 +18,7 @@ import (
 type Application struct {
 	Client *opennord.Client
 	Window *Window
+	Config *Config
 }
 
 // BuildApplication instantiates the Application and registers the GTK
@@ -26,6 +28,7 @@ func BuildApplication(builder *gtk.Builder) *Application {
 	app := &Application{
 		Client: nil,
 		Window: window,
+		Config: LoadConfig(),
 	}
 
 	return app
@@ -46,6 +49,46 @@ func (app Application) RegisterCallbacks() {
 		func() { _ = ConnectToGroup(&app) })
 	app.Window.ConnectTab.ServerConnectButton.Connect("clicked",
 		func() { _ = ConnectToServer(&app) })
+	app.Window.ConnectTab.BestConnectButton.Connect("clicked",
+		func() { _ = app.Connect("") })
+	app.Window.ConnectTab.SaveButton.Connect("clicked",
+		func() { _ = ConnectSaveClicked(&app) })
+
+	// Configure
+	app.Window.ConfigureTab.AutoConnectButton.Connect("clicked",
+		func() { _ = AutoConnectClicked(&app) })
+	app.Window.ConfigureTab.CyberSecSwitch.Connect("state-set",
+		func() { _ = CyberSecSwitchToggled(&app) })
+	app.Window.ConfigureTab.DnsButton.Connect("clicked",
+		func() { _ = DNSButtonClicked(&app) })
+	app.Window.ConfigureTab.FirewallSwitch.Connect("state-set",
+		func() { _ = FirewallSwitchToggled(&app) })
+	app.Window.ConfigureTab.IPv6Switch.Connect("state-set",
+		func() { _ = IPv6SwitchToggled(&app) })
+	app.Window.ConfigureTab.KillSwitchSwitch.Connect("state-set",
+		func() { _ = KillSwitchSwitchToggled(&app) })
+	app.Window.ConfigureTab.NotifySwitch.Connect("state-set",
+		func() { _ = NotificationsSwitchToggled(&app) })
+	app.Window.ConfigureTab.ObfuscationSwitch.Connect("state-set",
+		func() { _ = ObfuscationSwitchToggled(&app) })
+	app.Window.ConfigureTab.ProtocolComboText.Connect("changed",
+		func() { _ = ProtocolComboTextChanged(&app) })
+	app.Window.ConfigureTab.TechnologyComboText.Connect("changed",
+		func() { _ = TechnologyComboTextChanged(&app) })
+
+	// Whitelist
+	app.Window.WhiteListTab.SubnetAddButton.Connect("clicked",
+		func() { _ = SubnetAddButtonClicked(&app) })
+	app.Window.WhiteListTab.SubnetRemoveButton.Connect("clicked",
+		func() { _ = SubnetRemoveButtonClicked(&app) })
+	app.Window.WhiteListTab.UDPAddButton.Connect("clicked",
+		func() { _ = UDPAddButtonClicked(&app) })
+	app.Window.WhiteListTab.UDPRemoveButton.Connect("clicked",
+		func() { _ = UDPRemoveButtonClicked(&app) })
+	app.Window.WhiteListTab.TCPAddButton.Connect("clicked",
+		func() { _ = TCPAddButtonClicked(&app) })
+	app.Window.WhiteListTab.TCPRemoveButton.Connect("clicked",
+		func() { _ = TCPRemoveButtonClicked(&app) })
 
 	// Account
 	app.Window.AccountTab.RefreshButton.Connect("clicked",
@@ -153,6 +196,66 @@ func (app Application) PopulateGroups() error {
 	return nil
 }
 
+// PopulateProtocols makes a request via the client to retrieve all protocols
+// supported by the daemon.
+func (app Application) PopulateProtocols() error {
+	protocols, err := app.Client.SettingsProtocols()
+
+	if err != nil {
+		util.LogError("Unable to retrieve protocols", err)
+		infoBar := app.Window.InfoBar
+		infoBar.Button.SetLabel("Dismiss")
+		infoBar.Button.Connect("clicked", infoBar.HideMessage)
+		infoBar.DisplayMessage("Unable to retrieve protocols",
+			gtk.MESSAGE_ERROR)
+		return err
+	}
+
+	list, _ := gtk.ListStoreNew(glib.TYPE_STRING)
+	for _, group := range protocols.GetProtocols() {
+		appendIter := list.Append()
+		_ = list.SetValue(appendIter, 0, group)
+	}
+
+	renderer, _ := gtk.CellRendererTextNew()
+	configureTab := app.Window.ConfigureTab
+	configureTab.ProtocolComboText.SetModel(list)
+	configureTab.ProtocolComboText.PackStart(renderer, true)
+	configureTab.ProtocolComboText.SetActive(0)
+
+	return nil
+}
+
+// PopulateTechnologies makes a request via the client to retrieve all
+// technologies supported by the daemon.
+func (app Application) PopulateTechnologies() error {
+	technologies, err := app.Client.SettingsTechnologies()
+
+	if err != nil {
+		util.LogError("Unable to retrieve technologies", err)
+		infoBar := app.Window.InfoBar
+		infoBar.Button.SetLabel("Dismiss")
+		infoBar.Button.Connect("clicked", infoBar.HideMessage)
+		infoBar.DisplayMessage("Unable to retrieve technologies",
+			gtk.MESSAGE_ERROR)
+		return err
+	}
+
+	list, _ := gtk.ListStoreNew(glib.TYPE_STRING)
+	for _, group := range technologies.GetTechnologies() {
+		appendIter := list.Append()
+		_ = list.SetValue(appendIter, 0, group)
+	}
+
+	renderer, _ := gtk.CellRendererTextNew()
+	configureTab := app.Window.ConfigureTab
+	configureTab.TechnologyComboText.SetModel(list)
+	configureTab.TechnologyComboText.PackStart(renderer, true)
+	configureTab.TechnologyComboText.SetActive(0)
+
+	return nil
+}
+
 // ConnectToDaemon attempts to connect to the NordVPN daemon. If the connection
 // is successful, the connection status and account information will be updated.
 // Additionally, the countries, cities and groups on the 'Connect' tab will be
@@ -179,8 +282,133 @@ func (app *Application) ConnectToDaemon() error {
 	_ = app.PopulateCountries()
 	_ = app.PopulateCities()
 	_ = app.PopulateGroups()
+	_ = app.PopulateProtocols()
+	_ = app.PopulateTechnologies()
+	app.PopulateFromConfig()
 
 	return nil
+}
+
+func (app Application) PopulateFromConfig() {
+	connectTab := app.Window.ConnectTab
+
+	// Populate countries
+	model, _ := connectTab.CountriesComboBoxText.GetModel()
+	treeModel := model.ToTreeModel()
+	cnt := 0
+	treeModel.ForEach(func(model *gtk.TreeModel, path *gtk.TreePath,
+		iter *gtk.TreeIter) bool {
+		val, _ := treeModel.GetValue(iter, 0)
+		strVal, _ := val.GetString()
+		if app.Config.Connect.Country == strVal {
+			connectTab.CountriesComboBoxText.SetActive(cnt)
+		}
+		cnt++
+		return false
+	})
+
+	// Populate city
+	model, _ = connectTab.CitiesComboBoxText.GetModel()
+	treeModel = model.ToTreeModel()
+	cnt = 0
+	treeModel.ForEach(func(model *gtk.TreeModel, path *gtk.TreePath,
+		iter *gtk.TreeIter) bool {
+		val, _ := treeModel.GetValue(iter, 0)
+		strVal, _ := val.GetString()
+		if app.Config.Connect.City == strVal {
+			connectTab.CitiesComboBoxText.SetActive(cnt)
+		}
+		cnt++
+		return false
+	})
+
+	// Populate group
+	model, _ = connectTab.GroupsComboBoxText.GetModel()
+	treeModel = model.ToTreeModel()
+	cnt = 0
+	treeModel.ForEach(func(model *gtk.TreeModel, path *gtk.TreePath,
+		iter *gtk.TreeIter) bool {
+		val, _ := treeModel.GetValue(iter, 0)
+		strVal, _ := val.GetString()
+		if app.Config.Connect.Group == strVal {
+			connectTab.GroupsComboBoxText.SetActive(cnt)
+		}
+		cnt++
+		return false
+	})
+
+	// Populate server
+	connectTab.ServerEntry.SetText(app.Config.Connect.Server)
+
+	configureTab := app.Window.ConfigureTab
+	// Populate Auto-connect
+	configureTab.AutoConnectSwitch.SetActive(app.Config.AutoConnectEnabled)
+	configureTab.AutoConnectServerEntry.SetText(app.Config.AutoConnectServerTag)
+	configureTab.CyberSecSwitch.SetActive(app.Config.CyberSecEnabled)
+	configureTab.DNSEntry.SetText(strings.Join(app.Config.DNSServers, ","))
+	configureTab.FirewallSwitch.SetActive(app.Config.FirewallEnabled)
+	configureTab.IPv6Switch.SetActive(app.Config.IPv6Enabled)
+	configureTab.KillSwitchSwitch.SetActive(app.Config.KillSwitchEnabled)
+	configureTab.NotifySwitch.SetActive(app.Config.NotificationsEnabled)
+	configureTab.ObfuscationSwitch.SetActive(app.Config.ObfuscationEnabled)
+
+	model, _ = configureTab.ProtocolComboText.GetModel()
+	treeModel = model.ToTreeModel()
+	cnt = 0
+	treeModel.ForEach(func(model *gtk.TreeModel, path *gtk.TreePath,
+		iter *gtk.TreeIter) bool {
+		val, _ := treeModel.GetValue(iter, 0)
+		strVal, _ := val.GetString()
+		if app.Config.Protocol == strVal {
+			configureTab.ProtocolComboText.SetActive(cnt)
+		}
+		cnt++
+		return false
+	})
+
+	model, _ = configureTab.TechnologyComboText.GetModel()
+	treeModel = model.ToTreeModel()
+	cnt = 0
+	treeModel.ForEach(func(model *gtk.TreeModel, path *gtk.TreePath,
+		iter *gtk.TreeIter) bool {
+		val, _ := treeModel.GetValue(iter, 0)
+		strVal, _ := val.GetString()
+		if app.Config.Technology == strVal {
+			configureTab.TechnologyComboText.SetActive(cnt)
+		}
+		cnt++
+		return false
+	})
+
+	// Populate whitelist subnets
+	for _, subnet := range app.Config.WhiteList.Subnets {
+		label, _ := gtk.LabelNew(subnet)
+		row, _ := gtk.ListBoxRowNew()
+		row.SetHAlign(gtk.ALIGN_START)
+		row.Add(label)
+		app.Window.WhiteListTab.SubnetListBox.Add(row)
+		row.ShowAll()
+	}
+
+	// Populate whitelist UDP ports
+	for _, port := range app.Config.WhiteList.UDPPorts {
+		label, _ := gtk.LabelNew(strconv.FormatInt(int64(port), 10))
+		row, _ := gtk.ListBoxRowNew()
+		row.SetHAlign(gtk.ALIGN_START)
+		row.Add(label)
+		app.Window.WhiteListTab.UDPListBox.Add(row)
+		row.ShowAll()
+	}
+
+	// Populate whitelist TCP ports
+	for _, port := range app.Config.WhiteList.TCPPorts {
+		label, _ := gtk.LabelNew(strconv.FormatInt(int64(port), 10))
+		row, _ := gtk.ListBoxRowNew()
+		row.SetHAlign(gtk.ALIGN_START)
+		row.Add(label)
+		app.Window.WhiteListTab.TCPListBox.Add(row)
+		row.ShowAll()
+	}
 }
 
 // UpdateConnectionStatus updates the 'Connect' tab status and enables /
@@ -300,7 +528,7 @@ func (app Application) Connect(tag string) error {
 		ServerTag: tag,
 		Protocol:  pb.ProtocolEnum_UDP,
 		Obfuscate: false,
-		CyberSec:  false,
+		CyberSec:  app.Config.CyberSecEnabled,
 		Dns:       nil,
 		WhiteList: nil,
 	})

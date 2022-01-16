@@ -50,3 +50,17 @@ func BuilderGetFrame(builder *gtk.Builder, name string) *gtk.Frame {
 	obj, _ := builder.GetObject(name)
 	return obj.(*gtk.Frame)
 }
+
+// BuilderGetSwitch is a helper function for retrieving a generic GTK widget
+// from the builder and casting to a GTK Switch.
+func BuilderGetSwitch(builder *gtk.Builder, name string) *gtk.Switch {
+	obj, _ := builder.GetObject(name)
+	return obj.(*gtk.Switch)
+}
+
+// BuilderGetListBox is a helper function for retrieving a generic GTK widget
+// from the builder and casting to a GTK List Box.
+func BuilderGetListBox(builder *gtk.Builder, name string) *gtk.ListBox {
+	obj, _ := builder.GetObject(name)
+	return obj.(*gtk.ListBox)
+}

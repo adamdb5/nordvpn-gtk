@@ -7,12 +7,14 @@ import (
 
 // Window contains the GTK components for the root GTKWindow.
 type Window struct {
-	Window     *gtk.Window
-	InfoBar    *InfoBar
-	ConnectTab *ConnectTab
-	SessionTab *SessionTab
-	AccountTab *AccountTab
-	AboutTab   *AboutTab
+	Window       *gtk.Window
+	InfoBar      *InfoBar
+	ConnectTab   *ConnectTab
+	SessionTab   *SessionTab
+	ConfigureTab *ConfigureTab
+	WhiteListTab *WhitelistTab
+	AccountTab   *AccountTab
+	AboutTab     *AboutTab
 }
 
 // BuildWindow constructs the root GTKWindow for the application.
@@ -21,11 +23,13 @@ func BuildWindow(builder *gtk.Builder) *Window {
 	window.SetTitle(AppName)
 
 	return &Window{
-		Window:     window,
-		InfoBar:    BuildInfoBar(builder),
-		ConnectTab: BuildConnectTab(builder),
-		SessionTab: BuildSessionTab(builder),
-		AccountTab: BuildAccountTab(builder),
-		AboutTab:   BuildAboutTab(builder),
+		Window:       window,
+		InfoBar:      BuildInfoBar(builder),
+		ConnectTab:   BuildConnectTab(builder),
+		SessionTab:   BuildSessionTab(builder),
+		ConfigureTab: BuildConfigureTab(builder),
+		WhiteListTab: BuildWhitelistTab(builder),
+		AccountTab:   BuildAccountTab(builder),
+		AboutTab:     BuildAboutTab(builder),
 	}
 }

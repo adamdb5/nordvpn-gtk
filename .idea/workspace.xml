@@ -4,24 +4,19 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="996ade99-172a-430a-951b-19e21408d482" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/types/about_tab.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/types/account_tab.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/types/application.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/types/connect_tab.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/types/constants.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/types/info_bar.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/types/session_tab.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/util/builder.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/util/format.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/util/logging.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/nordvpn-gtk.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/nordvpn-gtk.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/types/types.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/window.go" afterDir="false" />
+    <list default="true" id="996ade99-172a-430a-951b-19e21408d482" name="Changes" comment="Added .idea directory">
+      <change afterPath="$PROJECT_DIR$/types/config.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/types/configure_tab.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/types/whitelist_tab.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/account_tab.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/account_tab.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/application.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/application.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/connect_tab.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/connect_tab.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/constants.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/constants.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/window.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/window.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/window.glade" beforeDir="false" afterPath="$PROJECT_DIR$/ui/window.glade" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/builder.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/builder.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/logging.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/logging.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,7 +49,7 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="ProjectErrors" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectId" id="23h6WnMXjZ5oKY0SKo9U5lGnnyX" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -109,6 +104,11 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Refactored entire codebase, implementing some object-oriented code and adding comments." />
+    <MESSAGE value="Added .idea directory" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added .idea directory" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>

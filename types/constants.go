@@ -8,4 +8,6 @@ const (
 	AppWebsite     = "https://github.com/adamdb5/nordvpn-gtk"
 	AppCopyright   = "2022 Adam Bruce"
 	AppLicense     = "<a href=\"https://github.com/adamdb5/nordvpn-gtk/blob/main/LICENSE\">MIT License</a>"
+	ConfigDir      = "nordvpn-gtk"
+	ConfigFile     = "nordvpn-gtk.conf"
 )
