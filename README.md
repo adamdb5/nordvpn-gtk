@@ -1,6 +1,6 @@
 # NordVPN GTK [WIP]
 
-NordVPN GTK is a GTK+ Linux client for NordVPN built using [OpenNord](href="https://github.com/adamdb5/opennord).
+NordVPN GTK is a GTK+ Linux client for NordVPN built using [OpenNord](https://github.com/adamdb5/opennord).
 
 Current, NordVPN GTK is in development and not all features are complete.
 
