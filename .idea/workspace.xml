@@ -4,19 +4,8 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="996ade99-172a-430a-951b-19e21408d482" name="Changes" comment="Added .idea directory">
-      <change afterPath="$PROJECT_DIR$/types/config.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/types/configure_tab.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/types/whitelist_tab.go" afterDir="false" />
+    <list default="true" id="996ade99-172a-430a-951b-19e21408d482" name="Changes" comment="Add session tab screenshot">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/types/account_tab.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/account_tab.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/types/application.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/application.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/types/connect_tab.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/connect_tab.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/types/constants.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/constants.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/types/window.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/window.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/window.glade" beforeDir="false" afterPath="$PROJECT_DIR$/ui/window.glade" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/builder.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/builder.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/logging.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/logging.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,11 +57,14 @@
     <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.watchers.conflict.with.on.save.actions.check.performed" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/docs/images" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.Go" />
+    <property name="settings.editor.selected.configurable" value="vcs.Git" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/docs/images" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/types" />
       <recent name="$PROJECT_DIR$" />
@@ -108,7 +100,10 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Refactored entire codebase, implementing some object-oriented code and adding comments." />
     <MESSAGE value="Added .idea directory" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added .idea directory" />
+    <MESSAGE value="Added configure and whitelist tabs. Implemented config loading and saving." />
+    <MESSAGE value="Add screenshot" />
+    <MESSAGE value="Add session tab screenshot" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add session tab screenshot" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
