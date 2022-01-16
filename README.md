@@ -8,6 +8,7 @@ TODO:
  - Partial config saving
  - Complete whitelist implementation
  - Refactor to use hierachial structure (stop passing a reference of the App to all functions)
+ - Consider re-writing this and OpenNord in a more performant language like C++ or Rust. (Unfortunately, there are no C bindings for gRPC)
 
 
 ## Screeshots
