@@ -271,7 +271,7 @@ func (app *Application) ConnectToDaemon() error {
 		return err
 	}
 
-	app.Client = &client
+	app.Client = client
 
 	// If we have a good client, we can register our callbacks
 	app.RegisterCallbacks()
